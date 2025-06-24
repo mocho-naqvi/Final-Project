@@ -1,0 +1,74 @@
+import random
+
+# Predefined question bank
+questions = {
+    "math": {
+        "easy": [
+            "What is 5 + 3?",
+            "What is 10 - 2?"
+        ],
+        "medium": [
+            "What is 12 x 3?",
+            "What is 144 ÷ 12?"
+        ],
+        "hard": [
+            "What is the derivative of x^2?",
+            "What is the integral of 2x dx?"
+        ]
+    },
+    "science": {
+        "easy": [
+            "What is H2O?",
+            "What planet do we live on?"
+        ],
+        "medium": [
+            "What is Newton's second law?",
+            "Define photosynthesis."
+        ],
+        "hard": [
+            "What is quantum entanglement?",
+            "Explain the theory of relativity."
+        ]
+    },
+    "history": {
+        "easy": [
+            "Who was the first President of the USA?",
+            "In which year did World War II end?"
+        ],
+        "medium": [
+            "What caused the French Revolution?",
+            "Name three major battles of WW1."
+        ],
+        "hard": [
+            "Describe the political causes of World War II.",
+            "What was the significance of the Treaty of Versailles?"
+        ]
+    }
+}
+
+def generate_quiz(topic, difficulty):
+    topic = topic.lower()
+    difficulty = difficulty.lower()
+
+    if topic not in questions:
+        return f"❌ Topic '{topic}' not found."
+    if difficulty not in questions[topic]:
+        return f"❌ Difficulty '{difficulty}' not found in topic '{topic}'."
+
+    selected_questions = random.sample(questions[topic][difficulty], k=2)
+    return selected_questions
+
+
+print("=== Offline Quiz Generator ===")
+print("Available topics: math, science, history")
+topic = input("Enter topic: ").strip()
+difficulty = input("Enter difficulty (easy, medium, hard): ").strip()
+
+quiz = generate_quiz(topic, difficulty)
+
+print("\nGenerated Quiz Questions:")
+if isinstance(quiz, list):
+    for i, q in enumerate(quiz, 1):
+        print(f"{i}. {q}")
+else:
+    print(quiz)

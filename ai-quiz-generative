@@ -1,0 +1,70 @@
+import openai
+import tkinter as tk
+from tkinter import messagebox, scrolledtext
+
+# ✅ OpenRouter API setup
+openai.api_base = "https://openrouter.ai/api/v1"
+openai.api_key = "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"
+
+def generate_questions(topic, difficulty):
+    prompt = f"Generate 3 {difficulty}-level quiz questions on the topic of {topic}."
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="deepseek/deepseek-r1-0528-qwen3-8b:free",
+            messages=[
+                {"role": "system", "content": "You are a helpful quiz generator."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        return response.choices[0].message.content.strip()
+
+    except openai.error.AuthenticationError:
+        return "❌ Invalid API key. Please check it."
+    except openai.error.RateLimitError:
+        return "❌ You have exceeded your quota. Please check your OpenAI usage or billing plan."
+    except Exception as e:
+        return f"❌ Unexpected error: {str(e)}"
+
+# ✅ GUI setup
+def on_generate():
+    topic = topic_entry.get().strip()
+    difficulty = difficulty_var.get().lower()
+
+    if not topic or not difficulty:
+        messagebox.showwarning("Input Error", "Please enter topic and select difficulty.")
+        return
+
+    output_box.delete('1.0', tk.END)
+    output_box.insert(tk.END, "Generating quiz...\n\n")
+    result = generate_questions(topic, difficulty)
+    output_box.insert(tk.END, result)
+
+# Create GUI window
+window = tk.Tk()
+window.title("AI Quiz Generator")
+window.geometry("500x400")
+window.resizable(False, False)
+
+# Topic input
+tk.Label(window, text="Enter Quiz Topic:", font=("Arial", 12)).pack(pady=5)
+topic_entry = tk.Entry(window, font=("Arial", 12), width=40)
+topic_entry.pack(pady=5)
+
+# Difficulty dropdown
+tk.Label(window, text="Select Difficulty Level:", font=("Arial", 12)).pack(pady=5)
+difficulty_var = tk.StringVar()
+difficulty_dropdown = tk.OptionMenu(window, difficulty_var, "Easy", "Medium", "Hard")
+difficulty_dropdown.config(font=("Arial", 11))
+difficulty_dropdown.pack()
+
+# Generate Button
+generate_btn = tk.Button(window, text="Generate Quiz", font=("Arial", 12), command=on_generate)
+generate_btn.pack(pady=10)
+
+# Output box
+output_box = scrolledtext.ScrolledText(window, font=("Courier", 11), width=58, height=12, wrap=tk.WORD)
+output_box.pack(padx=10, pady=10)
+
+# Run GUI
+window.mainloop()
